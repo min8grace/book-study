@@ -198,7 +198,7 @@ class FakeTransmitter
 class TransmitterAPI 
 
 ```
-![PredictingTransmitter.](/image/PredictingTransmitter.jpg "Predicting Transmitter")
+![PredictingTransmitter](images/PredictingTransmitter.jpg "Predicting Transmitter")
 
 
 ### Clean Boundaries
