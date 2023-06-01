@@ -22,32 +22,27 @@ Money plus(Money addend) {
     return new Money(amount + addend.amount, currency); 
 }
 ```
-There are times and tests that call for 
-careful thought. How are we going to represent multi-currency arithmetic? This is one of those 
-times for careful thought.
+The solution is to create an object that acts like a Money but represents the sum of two Moneys. I've tried several different metaphors to explain this idea. One is to treat the sum like a wallet: you can have several different notes of different denominations and currencies in the same wallet.
+Another metaphor is expression, as in "(2 + 3) * 5", or in our case "($2 + 3 CHF) * 5". A Money is the atomic form of an expression. Operations result in Expressions, one of which will be a Sum. Once the operation (such as adding up the value of a portfolio) is complete, the resulting Expression can be reduced back to a single currency given a set of exchange rates.
+```
+public void testSimpleAddition() {
+...
+assertEquals(Money.dollar(10), reduced); 
+}
+```
+The reduced Expression is created by applying exchange rates to an Expression. What in the real world applies exchange rates? A bank.
+```
+public void testSimpleAddition() {
+...
+Money reduced= bank.reduce(sum, "USD"); 
+assertEquals(Money.dollar(10), reduced);
+}
+```
+* Expressions seem to be at the heart of what we are doing. I try to keep the objects at the heart as ignorant of the rest of the world as possible, so they stay flexible as long as possible(and remain easy to test, and reuse, and understand).
 
+* I can imagine there will be many operations involving Expressions. If we add every operation to Expression, then Expression will grow without limit.
 
-Objects to the rescue. When the object we have doesn't behave the way we want it to, we 
-make another object with the same external protocol (an imposter) but a different 
-implementation.
-
-
-One is to treat the sum 
-like a wallet: you can have several different notes of different denominations and currencies 
-in the same wallet.
-
-
-the expression is as in "(2 + 3) * 5", or in our case "($2 + 3 CHF) * 5".
-
-* Expressions seem to be at the heart of what we are doing. I try to keep the objects at the 
-heart as ignorant of the rest of the world as possible, so they stay flexible as long as possible
-(and remain easy to test, and reuse, and understand).
-
-* I can imagine there will be many operations involving Expressions. If we add every operation 
-to Expression, then Expression will grow without limit.
-
-The Bank in our simple example doesn't really need to do anything. As long as we have an 
-object, we're okay:
+ I'm also perfectly willing to move responsibility for reduction(applies exchange rates) to Expression if it turns out that Banks don't need to be involved. The Bank in our simple example doesn't really need to do anything. As long as we have an object, we're okay:
 ```java
 public void testSimpleAddition() {
     ...
